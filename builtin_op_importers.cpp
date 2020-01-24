@@ -2123,6 +2123,14 @@ DEFINE_BUILTIN_OP_IMPORTER(PRelu)
     ASSERT(inputs.size() == 2, ErrorCode::kINVALID_NODE);
     nvinfer1::ITensor* input = &convertToTensor(inputs.at(0), ctx);
     nvinfer1::ITensor* slopes = &convertToTensor(inputs.at(1), ctx);
+
+    std::vector<int> axes{1, 1};
+    slopes = unsqueezeTensor(ctx, *slopes, axes);
+    ASSERT(slopes, ErrorCode::kUNSUPPORTED_NODE);
+    std::vector<int> axes_{1, 1, 1};
+    slopes = unsqueezeTensor(ctx, *slopes, axes_);
+    ASSERT(slopes, ErrorCode::kUNSUPPORTED_NODE);
+
     ASSERT(input->getType() != nvinfer1::DataType::kINT32, ErrorCode::kUNSUPPORTED_NODE);
     ASSERT(slopes->getType() != nvinfer1::DataType::kINT32, ErrorCode::kUNSUPPORTED_NODE);
     broadcastTensors(ctx, input, slopes);
